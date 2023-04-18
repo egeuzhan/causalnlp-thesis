@@ -186,8 +186,8 @@ def official_evaluate(tmp, path, sp, lp):
         re_f1_ignore_train = 2.0 * re_p_ignore_train * re_r / (re_p_ignore_train + re_r)
 
     ### Ege: Added prints for each score
-    print("F1-score: " + re_f1)
-    print("Precision: " + re_p)
-    print("Recall: " + re_r)
+    print("F1-score: " + str(re_f1))
+    print("Precision: " + str(re_p))
+    print("Recall: " + str(re_r))
         
     return re_f1, evi_f1, re_f1_ignore_train_annotated, re_f1_ignore_train, re_p, re_r
