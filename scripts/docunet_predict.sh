@@ -8,7 +8,7 @@ if true; then
   transformer_type=bert
   channel_type=context-based
   if [[ $transformer_type == bert ]]; then
-    bs=16
+    bs=4
     bl=5e-5
     uls=(5e-5)
     accum=1
