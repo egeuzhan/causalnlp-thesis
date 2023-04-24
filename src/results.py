@@ -30,11 +30,13 @@ def show_result(pred_path, source_path):
                 effect = effect[0]
                 df_print.loc[idx] = [title, cause, effect]
     # calculate total causal relations
-    for idx, elem in df_original.iterrows():
-        labels = elem['labels']
-        for label in labels:
-            rel_count += 1
-    df_print.to_json('file.json', orient = 'records')
+    #for idx, elem in df_original.iterrows():
+    #    labels = elem['labels']
+    #    for label in labels:
+    #        rel_count += 1
+    with open('../predictions/final_predictions.json', 'w') as file:
+        out = df_print.to_json(orient = 'records')
+        file.write(out)
 
 # implements the model argument for selecting the model
 def main():
@@ -45,10 +47,10 @@ def main():
     args = parser.parse_args()
 
     if args.model == "atlop":
-        show_result("../predictions/atlop/atlop_predictions.json", "../data/test_ie.json")
+        show_result("../predictions/atlop/atlop_predictions.json", "../predictions/ner/test_ie_ent.json")
   
     if args.model == "docunet":
-        show_result("../predictions/docunet/docunet_predictions.json", "../data/test_ie.json")
+        show_result("../predictions/docunet/docunet_predictions.json", "../predictions/ner/test_ie_ent.json")
 
 
 if __name__ == '__main__':

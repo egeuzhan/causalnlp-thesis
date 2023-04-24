@@ -67,7 +67,7 @@ def gen_train_facts(data_file_name, truth_dir):
 
 ### Ege: added new arguments for the method
 ### Original: def official_evaluate(tmp, path):
-def official_evaluate(tmp, path, sp, lp):
+def official_evaluate(tmp, path, sp, lp, test_file):
     '''
         Adapted from the official evaluation code
     '''
@@ -84,7 +84,10 @@ def official_evaluate(tmp, path, sp, lp):
     
     ### Original for if-else: truth = json.load(open(os.path.join(path, "dev.json")))
     if sp == '' and lp != '':
-        truth = json.load(open(os.path.join(path, "test_ie_ent.json")))
+        if test_file == "test_ie_ent.json":
+            truth = json.load(open(os.path.join(path, "test_ie_ent.json")))
+        else: 
+            truth = json.load(open(os.path.join(path, "test_ie.json")))
     else:
         truth = json.load(open(os.path.join(path, "val.json")))
     

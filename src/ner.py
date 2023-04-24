@@ -70,7 +70,7 @@ def ner_model(model_path, test_file_path):
         jsonlist = []
 
     # parse into docred format for the RE
-    with open('../predictions/ner/test_ie_ent.json', 'w') as f2:
+    with open('../predictions/ner/test_ie_ent_pred.json', 'w') as f2:
         sent_id = 0
         for title, sent, tags in zip(titlelist, sentencelist, tagslist):
             newDataset = pd.DataFrame(columns=['title', 'sents', 'vertexSet'])
@@ -94,15 +94,15 @@ def ner_model(model_path, test_file_path):
                     if tag == 'C':
                         if prev_tag != 'C':
                             start_pos = i
-                            if i == len(sent) - 1 or tags[i+1] != 'C':
-                                end_pos = i
-                                causelist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
+                        if i == len(sent) - 1 or tags[i+1] != 'C':
+                            end_pos = i
+                            causelist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
                     if tag == 'E':
                         if prev_tag != 'E':
                             start_pos = i
-                            if i == len(sentence) - 1 or tags[i+1] != 'E':
-                                end_pos = i
-                                effectlist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
+                        if i == len(sentence) - 1 or tags[i+1] != 'E':
+                            end_pos = i
+                            effectlist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
                     prev_tag = tag
 
                 # create entities from elements in cause and effect lists
@@ -113,7 +113,8 @@ def ner_model(model_path, test_file_path):
                     ds_dict = {'name': elem2[0], 'pos': [elem2[1][0], elem2[1][1]], 'label': 'EFFECT', 'sent_id': sent_id}
                     ds.append(ds_dict)
                 if len(ds) > 0:
-                    vertexSet.append(ds)
+                    for elem in ds:
+                        vertexSet.append([elem])
 
                 # create final entity
                 data = {'title': t, 'sents': sents, 'vertexSet': vertexSet}
@@ -138,15 +139,15 @@ def ner_model(model_path, test_file_path):
                             if tag == 'C':
                                 if prev_tag != 'C':
                                     start_pos = i
-                                    if i == len(sent) - 1 or tags[i+1] != 'C':
-                                        end_pos = i
-                                        causelist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
+                                if i == len(sent) - 1 or tags[i+1] != 'C':
+                                    end_pos = i
+                                    causelist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
                             if tag == 'E':
                                 if prev_tag != 'E':
                                     start_pos = i
-                                    if i == len(sent) - 1 or tags[i+1] != 'E':
-                                        end_pos = i
-                                        effectlist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
+                                if i == len(sent) - 1 or tags[i+1] != 'E':
+                                    end_pos = i
+                                    effectlist.append((sent[start_pos:end_pos+1], (start_pos, end_pos + 1)))
                             prev_tag = tag
 
                 # put each cause and effect entity in the vertexSet(entity list)
@@ -157,11 +158,30 @@ def ner_model(model_path, test_file_path):
                     ds_dict = {'name': elem2[0], 'pos': [elem2[1][0], elem2[1][1]], 'label': 'EFFECT', 'sent_id': sent_id}
                     ds.append(ds_dict)
                 if len(ds) > 0:
-                    element['vertexSet'].append(ds)
+                    for elem in ds: 
+                        element['vertexSet'].append([elem])
 
 
         f2.write(json.dumps(jsonlist))
     f2.close()
+
+    with open('../predictions/ner/test_ie_ent.json', 'w') as file:
+        df = pd.read_json('../predictions/ner/test_ie_ent_pred.json')
+        new_ds = pd.DataFrame(columns=['title', 'sents', 'vertexSet'])
+        for idx, row in df.iterrows():
+            cause = 0
+            effect = 0
+            for elem in row['vertexSet']:
+                if elem[0]['label'] == 'CAUSE':
+                    cause += 1
+                if elem[0]['label'] == 'EFFECT':
+                    effect += 1
+            if cause > 1 and effect > 1:
+                new_ds.loc[-1] = row
+                new_ds.index = new_ds.index + 1
+                new_ds = new_ds.sort_index()
+        out = new_ds.to_json(orient='records')
+        file.write(out)    
 
     # copy test set into each cv-set folder 
     src_path = "../predictions/ner/test_ie_ent.json"

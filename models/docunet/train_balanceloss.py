@@ -171,7 +171,7 @@ def evaluate(args, model, features, tag="dev"):
     if len(ans) > 0:
         ### Ege: Added arguments for save and load path
         ### Original: best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir)
-        best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir, args.save_path, args.load_path)
+        best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir, args.save_path, args.load_path, args.test_file)
     output = {
         tag + "_F1": best_f1 * 100,
         tag + "_F1_ign": best_f1_ign * 100,
