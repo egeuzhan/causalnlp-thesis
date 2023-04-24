@@ -229,7 +229,7 @@ def main():
 
         ### Ege: Added evaluation for test set
         T_features = test_features
-        T_score, T_output = evaluate(args, model, T_features, tag='test')
+        #T_score, T_output = evaluate(args, model, T_features, tag='test')
         pred = report(args, model, T_features)
         
         ### Ege: Modified prediction result path
